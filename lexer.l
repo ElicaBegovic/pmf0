@@ -30,7 +30,7 @@ OPERACIJE [-*/+%]
                                     }
 
 {TIP}                               {
-                                        printf("%s\n", yytext);
+                                        printf("tip %s\n", yytext);
                                     }
 
 {KEYWORD}                           {
@@ -98,13 +98,13 @@ OPERACIJE [-*/+%]
 
 <LINE_COMMENT>{
 "\n"                { BEGIN(INITIAL); } 
-"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara"); }
+"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara\n"); }
 .                   { }
 }
 
 <MULTILINE_COMMENT>{
 "*/"                { BEGIN(INITIAL); }
-"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara"); }
+"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara\n"); }
 .                   { }
 "\n"                { }
 }
