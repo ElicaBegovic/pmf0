@@ -6,8 +6,9 @@
 
 %x LINE_COMMENT
 %x MULTILINE_COMMENT
+%option yylineno
 
-KEYWORD IF|ELSE|WHILE|FOR
+KEYWORD IF|ELSE|WHILE|FOR|BREAK
 BOOLEAN TRUE|FALSE
 TIP INT|DOUBLE|BOOL|STRING
 OPERACIJE [-*/+%]
@@ -43,6 +44,8 @@ OPERACIJE [-*/+%]
 
 [a-zA-Z][0-9a-zA-Z_]*               {   if(strlen(yytext)<=31){
                                             printf("ID %s\n",yytext);
+                                        }else{
+                                            printf("ID je predugačak, greška u liniji %d\n", yylineno);
                                         }
                                     }
 
@@ -98,13 +101,13 @@ OPERACIJE [-*/+%]
 
 <LINE_COMMENT>{
 "\n"                { BEGIN(INITIAL); } 
-"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara\n"); }
+"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara, geška u liniji %d\n",yylineno); }
 .                   { }
 }
 
 <MULTILINE_COMMENT>{
 "*/"                { BEGIN(INITIAL); }
-"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara\n"); }
+"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara, geška u liniji %d\n",yylineno); }
 .                   { }
 "\n"                { }
 }

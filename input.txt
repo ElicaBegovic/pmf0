@@ -8,4 +8,4 @@ BOOL elica_324=TRUE
 */
 IF 1 <= 3 ()
 WHILE TRUE()
-
+DOUBLE d2=0.12
