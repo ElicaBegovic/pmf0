@@ -1,11 +1,2 @@
-INT prom11prom111prom1111=5
-STRING string1= "elica"
-INT k=12 + 0X12aE
-DOUBLE d1=2 + 12.E+2 
-BOOL elica_324=TRUE
-/*
-//komentar
-*/
-IF 1 <= 3 ()
-WHILE TRUE()
-DOUBLE d2=0.12
+x=3==3;
+y=TRUE && TRUE
