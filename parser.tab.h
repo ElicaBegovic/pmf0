@@ -60,8 +60,15 @@
      T_NOT = 276,
      T_LEFTP = 277,
      T_RIGHTP = 278,
-     T_ID = 279,
-     T_EQ = 280
+     T_LEFTC = 279,
+     T_RIGHTC = 280,
+     T_ID = 281,
+     T_IF = 282,
+     T_ELSE = 283,
+     T_WHILE = 284,
+     T_FOR = 285,
+     T_BREAK = 286,
+     T_EQ = 287
    };
 #endif
 
@@ -82,7 +89,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 86 "parser.tab.h"
+#line 93 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

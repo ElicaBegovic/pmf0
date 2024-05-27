@@ -9,9 +9,8 @@
 %x MULTILINE_COMMENT
 %option yylineno
 
-KEYWORD IF|ELSE|WHILE|FOR|BREAK
-BOOLEAN TRUE|FALSE
-TIP INT|DOUBLE|BOOL|STRING
+BOOLEAN true|false
+TIP int|double|bool|string
 OPERACIJE [-*/+%]
 
 %%
@@ -26,25 +25,27 @@ OPERACIJE [-*/+%]
                                                         }
 
 0[1-7][0-7]*                                            {
-                                                            printf("OKT %s\n",yytext);
+                                                            printf("okt %s\n",yytext);
                                                         }
 
 {BOOLEAN}                           {
-                                        if (strcmp(yytext, "TRUE") == 0) {
+                                        if (strcmp(yytext, "true") == 0) {
                                             yylval.bool_value=1;
-                                        } else if (strcmp(yytext, "FALSE") == 0) {
+                                        } else if (strcmp(yytext, "false") == 0) {
                                             yylval.bool_value=0;
                                         } 
-                                        return strcmp(yytext, "TRUE") == 0 ? T_TRUE : T_FALSE;
+                                        return strcmp(yytext, "true") == 0 ? T_TRUE : T_FALSE;
                                     }
 
 {TIP}                               {
                                         printf("tip %s\n", yytext);
                                     }
 
-{KEYWORD}                           {
-                                        printf("%s\n",yytext);
-                                    }
+"if"                                { return T_IF; }
+"else"                              { return T_ELSE; }
+"while"                             { return T_WHILE; }
+"for"                               { return T_FOR; }
+"break"                             { return T_BREAK; }
 
 {OPERACIJE}                         {
                                         switch (yytext[0]) {
@@ -83,7 +84,7 @@ OPERACIJE [-*/+%]
 "=="                                { return T_EQEQ; }
 "!="                                { return T_NEQ; }
 
-\!                                  {
+"!"                                 {
                                         return T_NOT;
                                     }
 
@@ -100,11 +101,19 @@ OPERACIJE [-*/+%]
                                     }
 
 "("                                 {
-                                        printf("%s\n" ,yytext);
+                                        return T_LEFTP;
                                     }
 
 ")"                                 {
-                                        printf("%s\n" ,yytext);
+                                        return T_RIGHTP;
+                                    }
+
+"{"                                 {
+                                        return T_LEFTC;
+                                    }
+
+"}"                                 {
+                                        return T_RIGHTC;
                                     }
 
 "\\"                                {
