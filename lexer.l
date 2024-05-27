@@ -30,14 +30,12 @@ OPERACIJE [-*/+%]
                                                         }
 
 {BOOLEAN}                           {
-                                        if (strcmp(yytext, "true") == 0) {
-                                            return T_TRUE;
-                                        } else if (strcmp(yytext, "false") == 0) {
-                                            return T_FALSE;
-                                        } else {
-                                            printf("Nepoznat boolean token: %s\n", yytext);
-                                            /* Možete dodati kod za tretman grešaka ako je potrebno */
-                                        }
+                                        if (strcmp(yytext, "TRUE") == 0) {
+                                            yylval.bool_value=1;
+                                        } else if (strcmp(yytext, "FALSE") == 0) {
+                                            yylval.bool_value=0;
+                                        } 
+                                        return strcmp(yytext, "TRUE") == 0 ? T_TRUE : T_FALSE;
                                     }
 
 {TIP}                               {
@@ -86,7 +84,7 @@ OPERACIJE [-*/+%]
 "!="                                { return T_NEQ; }
 
 \!                                  {
-                                        printf("NOT\n");
+                                        return T_NOT;
                                     }
 
 "="                                 {

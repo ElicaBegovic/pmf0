@@ -24,21 +24,24 @@
 %token T_SC
 %token T_PLUS T_MINUS T_MULT T_DIV T_MOD
 %token T_LT T_GT T_LE T_GE T_EQEQ T_NEQ
-%token T_TRUE T_FALSE
-%token T_AND T_OR
+%token <bool_value> T_TRUE T_FALSE
+%token T_AND T_OR T_NOT
 %token T_LEFTP T_RIGHTP
 %token <ident> T_ID
 %token T_EQ
 
+%right T_EQ
+%left T_OR T_AND
+%left T_EQEQ T_NEQ
+%left T_LT T_GT T_LE T_GE
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV T_MOD
-%left T_LT T_GT T_LE T_GE T_EQEQ T_NEQ
+%right T_NOT
 
 %type <int_value> int_exp
 %type <double_value> double_exp
 %type <bool_value> comp_exp
 %type <bool_value> bool_exp
-%type <int_value> exp
 %type <int_value> stat
 
 %%
@@ -46,14 +49,14 @@ S: S stat                         { }
     | //prazna rec
 ;
 
-stat: exp T_SC   { printf("%d\n", $1); } 
-    | T_ID T_EQ exp T_SC  { }
-;
-
-exp: int_exp { $$ = $1; }
-    | double_exp { $$ = $1; }
-    | comp_exp { $$ = $1; }
-    | bool_exp { $$ = $1; }
+stat: int_exp T_SC { printf("%d\n", $1); } 
+    | double_exp T_SC { printf("%f\n", $1); } 
+    | comp_exp T_SC { printf("%s\n", $1 ? "True" : "False"); }
+    | bool_exp T_SC { printf("%s\n", $1 ? "True" : "False"); }
+    | T_ID T_EQ int_exp T_SC  { }
+    | T_ID T_EQ double_exp T_SC  { }
+    | T_ID T_EQ comp_exp T_SC  { }
+    | T_ID T_EQ bool_exp T_SC { }
 ;
 
 int_exp: T_INT { $$ = $1; }
@@ -87,9 +90,13 @@ comp_exp: int_exp T_LT int_exp { $$ = $1 < $3 ? 1 : 0; } // poređenje za int
 
 bool_exp: T_TRUE { $$ = $1; }
     | T_FALSE { $$ = $1; }
+    | T_NOT bool_exp { $$ = !$2; }
+    | comp_exp { $$ = $1; }
     | bool_exp T_AND bool_exp { $$ = $1 && $3; }
     | bool_exp T_OR bool_exp { $$ = $1 || $3; }
+    
 ;
+
 %%
 
 void yyerror(const char* s){

@@ -753,33 +753,31 @@ case 4:
 YY_RULE_SETUP
 #line 32 "lexer.l"
 {
-                                        if (strcmp(yytext, "true") == 0) {
-                                            return T_TRUE;
-                                        } else if (strcmp(yytext, "false") == 0) {
-                                            return T_FALSE;
-                                        } else {
-                                            printf("Nepoznat boolean token: %s\n", yytext);
-                                            /* Možete dodati kod za tretman grešaka ako je potrebno */
-                                        }
+                                        if (strcmp(yytext, "TRUE") == 0) {
+                                            yylval.bool_value=1;
+                                        } else if (strcmp(yytext, "FALSE") == 0) {
+                                            yylval.bool_value=0;
+                                        } 
+                                        return strcmp(yytext, "TRUE") == 0 ? T_TRUE : T_FALSE;
                                     }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "lexer.l"
+#line 41 "lexer.l"
 {
                                         printf("tip %s\n", yytext);
                                     }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 47 "lexer.l"
+#line 45 "lexer.l"
 {
                                         printf("%s\n",yytext);
                                     }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 51 "lexer.l"
+#line 49 "lexer.l"
 {
                                         switch (yytext[0]) {
                                             case '+':
@@ -800,7 +798,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 69 "lexer.l"
+#line 67 "lexer.l"
 {   if(strlen(yytext)<=31){
                                             printf("%s",yytext);
                                         }else{
@@ -810,166 +808,166 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 76 "lexer.l"
+#line 74 "lexer.l"
 {
                                         printf("STRING %s\n", yytext);
                                     }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 81 "lexer.l"
+#line 79 "lexer.l"
 { return T_LE; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 82 "lexer.l"
+#line 80 "lexer.l"
 { return T_GE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 83 "lexer.l"
+#line 81 "lexer.l"
 { return T_LT; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 84 "lexer.l"
+#line 82 "lexer.l"
 { return T_GT; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 85 "lexer.l"
+#line 83 "lexer.l"
 { return T_EQEQ; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 86 "lexer.l"
+#line 84 "lexer.l"
 { return T_NEQ; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 88 "lexer.l"
+#line 86 "lexer.l"
 {
-                                        printf("NOT\n");
+                                        return T_NOT;
                                     }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 92 "lexer.l"
+#line 90 "lexer.l"
 {
                                         printf("=");
                                     }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 96 "lexer.l"
+#line 94 "lexer.l"
 {
                                         return T_AND;
                                     }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 100 "lexer.l"
+#line 98 "lexer.l"
 {
                                         return T_OR;
                                     }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 104 "lexer.l"
+#line 102 "lexer.l"
 {
                                         printf("%s\n" ,yytext);
                                     }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 108 "lexer.l"
+#line 106 "lexer.l"
 {
                                         printf("%s\n" ,yytext);
                                     }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 112 "lexer.l"
+#line 110 "lexer.l"
 {
                                         printf("%s\n" ,yytext);
                                     }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 116 "lexer.l"
+#line 114 "lexer.l"
 {
                                         return T_SC;
                                     }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 120 "lexer.l"
+#line 118 "lexer.l"
 { }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 122 "lexer.l"
+#line 120 "lexer.l"
 {
                         BEGIN(LINE_COMMENT);
                     }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 126 "lexer.l"
+#line 124 "lexer.l"
 {
                         BEGIN(MULTILINE_COMMENT);
                     }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 130 "lexer.l"
+#line 128 "lexer.l"
 { }
 	YY_BREAK
 
 case 28:
 YY_RULE_SETUP
-#line 133 "lexer.l"
+#line 131 "lexer.l"
 { BEGIN(INITIAL); } 
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 134 "lexer.l"
+#line 132 "lexer.l"
 { printf("Nije moguce ugnjezdavanje komentara, geška u liniji %d\n",yylineno); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 135 "lexer.l"
+#line 133 "lexer.l"
 { }
 	YY_BREAK
 
 
 case 31:
 YY_RULE_SETUP
-#line 139 "lexer.l"
+#line 137 "lexer.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 140 "lexer.l"
+#line 138 "lexer.l"
 { printf("Nije moguce ugnjezdavanje komentara, geška u liniji %d\n",yylineno); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 141 "lexer.l"
+#line 139 "lexer.l"
 { }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 142 "lexer.l"
+#line 140 "lexer.l"
 { }
 	YY_BREAK
 
 case 35:
 YY_RULE_SETUP
-#line 145 "lexer.l"
+#line 143 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 973 "lex.yy.c"
+#line 971 "lex.yy.c"
 			case YY_STATE_EOF(INITIAL):
 			case YY_STATE_EOF(LINE_COMMENT):
 			case YY_STATE_EOF(MULTILINE_COMMENT):
@@ -1855,5 +1853,5 @@ int main()
 	return 0;
 	}
 #endif
-#line 145 "lexer.l"
+#line 143 "lexer.l"
 
