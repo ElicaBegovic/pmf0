@@ -9,7 +9,6 @@
 %x MULTILINE_COMMENT
 %option yylineno
 
-BOOLEAN true|false
 TIP int|double|bool|string
 OPERACIJE [-*/+%]
 
@@ -28,14 +27,8 @@ OPERACIJE [-*/+%]
                                                             printf("okt %s\n",yytext);
                                                         }
 
-{BOOLEAN}                           {
-                                        if (strcmp(yytext, "true") == 0) {
-                                            yylval.bool_value=1;
-                                        } else if (strcmp(yytext, "false") == 0) {
-                                            yylval.bool_value=0;
-                                        } 
-                                        return strcmp(yytext, "true") == 0 ? T_TRUE : T_FALSE;
-                                    }
+"true"                              { yylval.bool_value = 1; return T_TRUE; }
+"false"                             { yylval.bool_value = 0; return T_FALSE; }
 
 {TIP}                               {
                                         printf("tip %s\n", yytext);
@@ -66,7 +59,10 @@ OPERACIJE [-*/+%]
                                     }
 
 [a-zA-Z][0-9a-zA-Z_]*               {   if(strlen(yytext)<=31){
-                                            printf("%s",yytext);
+                                            //printf("%s",yytext);
+                                            yylval.ident=yytext;
+                                            printf("%s = ", yytext);
+                                            return T_ID;
                                         }else{
                                             printf("ID je predugačak, greška u liniji %d\n", yylineno);
                                         }
@@ -89,7 +85,7 @@ OPERACIJE [-*/+%]
                                     }
 
 "="                                 {
-                                        printf("=");
+                                        return T_EQ;
                                     }
 
 "&&"                                {

@@ -2,13 +2,7 @@
     #include <stdlib.h> 
     #include <stdio.h>
 
-    struct Promenljiva {
-        char *id;
-        int val;
-    };
-
     void yyerror(const char* s);
-    struct Promenljiva tabela_simbola[50];
 %}
 
 %union {
@@ -43,6 +37,7 @@
 %type <double_value> double_exp
 %type <bool_value> comp_exp
 %type <bool_value> bool_exp
+%type <int_value> if_exp
 %type <int_value> stat
 
 %%
@@ -50,15 +45,11 @@ S: S stat                         { }
     | //prazna rec
 ;
 
-stat: int_exp T_SC { printf("%d\n", $1); } 
-    | double_exp T_SC { printf("%f\n", $1); } 
-    | comp_exp T_SC { printf("%s\n", $1 ? "True" : "False"); }
-    | bool_exp T_SC { printf("%s\n", $1 ? "True" : "False"); }
-    | T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC  { if ($3==1) { $$ = $6; } }
-    | T_ID T_EQ int_exp T_SC  { }
-    | T_ID T_EQ double_exp T_SC  { }
-    | T_ID T_EQ comp_exp T_SC  { }
-    | T_ID T_EQ bool_exp T_SC { }
+stat: T_ID T_EQ int_exp T_SC  { printf("%d \n", $3); }
+    | T_ID T_EQ double_exp T_SC  { printf("%f \n", $3); }
+    | T_ID T_EQ comp_exp T_SC  { printf("%s \n", $3 ? "True":"False"); }
+    | T_ID T_EQ bool_exp T_SC { printf("%s \n", $3 ? "True":"False"); }
+    | if_exp { }
 ;
 
 int_exp: T_INT { $$ = $1; }
@@ -78,7 +69,7 @@ double_exp: T_DOUBLE { $$ = $1; }
     | T_LEFTP double_exp T_RIGHTP { $$ = $2; }
 ;
 
-comp_exp: T_INT { $$ = $1; } //dodato za vise
+comp_exp: T_INT { $$ = $1; } //dodato za vise NE RADI
     | T_DOUBLE { $$ = $1; } //dodato za vise
     | int_exp T_LT int_exp { $$ = $1 < $3 ? 1 : 0; } // poređenje za int
     | int_exp T_GT int_exp { $$ = $1 > $3 ? 1 : 0; }
@@ -92,7 +83,7 @@ comp_exp: T_INT { $$ = $1; } //dodato za vise
     | double_exp T_GE double_exp { $$ = $1 >= $3 ? 1 : 0; }
     | double_exp T_EQEQ double_exp { $$ = $1 == $3 ? 1 : 0; }
     | double_exp T_NEQ double_exp { $$ = $1 != $3 ? 1 : 0; }
-    | comp_exp T_LT comp_exp { $$ = $1 && $3 ? 1 : 0; } // poređenja za vise
+    | comp_exp T_LT comp_exp { $$ = $1 && $3 ? 1 : 0; } // poređenja za vise NE RADI
     | comp_exp T_GT comp_exp { $$ = $1 && $3 ? 1 : 0; }
     | comp_exp T_LE comp_exp { $$ = $1 && $3 ? 1 : 0; }
     | comp_exp T_GE comp_exp { $$ = $1 && $3 ? 1 : 0; }
@@ -106,10 +97,13 @@ bool_exp: T_TRUE { $$ = $1; }
     | comp_exp { $$ = $1; }
     | bool_exp T_AND bool_exp { $$ = $1 && $3; }
     | bool_exp T_OR bool_exp { $$ = $1 || $3; }
-    | T_NOT bool_exp { $$ = !$2; }
+    | T_NOT bool_exp { $$ = $2==1 ? 0 : 1; }
     | T_LEFTP bool_exp T_RIGHTP { $$ = $2; }
     
 ;
+
+if_exp: T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC T_ELSE T_LEFTC stat T_RIGHTC { if ($3==1) { $$ = $6; } else { $$ = $10; } }
+    | T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC  { if ($3) { $$ = $6; } }
 
 %%
 
