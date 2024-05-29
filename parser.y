@@ -38,6 +38,7 @@
 %type <bool_value> comp_exp
 %type <bool_value> bool_exp
 %type <int_value> if_exp
+%type <int_value> while_exp
 %type <int_value> stat
 
 %%
@@ -50,6 +51,7 @@ stat: T_ID T_EQ int_exp T_SC  { printf("%d \n", $3); }
     | T_ID T_EQ comp_exp T_SC  { printf("%s \n", $3 ? "True":"False"); }
     | T_ID T_EQ bool_exp T_SC { printf("%s \n", $3 ? "True":"False"); }
     | if_exp { }
+    | while_exp { }
 ;
 
 int_exp: T_INT { $$ = $1; }
@@ -104,6 +106,9 @@ bool_exp: T_TRUE { $$ = $1; }
 
 if_exp: T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC T_ELSE T_LEFTC stat T_RIGHTC { if ($3==1) { $$ = $6; } else { $$ = $10; } }
     | T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC  { if ($3) { $$ = $6; } }
+
+while_exp: T_WHILE T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC { if ($3) { $$ = $6; } }
+
 
 %%
 
