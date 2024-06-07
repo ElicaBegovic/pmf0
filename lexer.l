@@ -2,125 +2,107 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+
+    #include "errors.h"
+    #include "errors.c"
     #include "parser.tab.h"
+
+    int yycolumn=1;
 %}
 
 %x LINE_COMMENT
 %x MULTILINE_COMMENT
 %option yylineno
 
-TIP int|double|bool|string
-OPERACIJE [-*/+%]
 
 %%
+
 (0|([1-9][0-9]*))|((0x|0X)[1-9A-Fa-f][0-9A-Fa-f]*)      {
                                                             yylval.int_value = atoi(yytext);
+                                                            yycolumn += strlen(yytext);
                                                             return T_INT;
                                                         }
 
 [0-9]+"."[0-9]*(("E"|"e")("+"|"-")?[0-9]+)?             {
                                                             yylval.double_value = atof(yytext);
+                                                            yycolumn += strlen(yytext);
                                                             return T_DOUBLE;
                                                         }
 
-0[1-7][0-7]*                                            {
-                                                            printf("okt %s\n",yytext);
-                                                        }
+"+"                                 { yycolumn++; return T_PLUS; }
+"-"                                 { yycolumn++; return T_MINUS; }
+"*"                                 { yycolumn++; return T_MULT; }
+"/"                                 { yycolumn++; return T_DIV; }
+"%"                                 { yycolumn++; return T_MOD; }
 
-"true"                              { yylval.bool_value = 1; return T_TRUE; }
-"false"                             { yylval.bool_value = 0; return T_FALSE; }
+"TRUE"                              { yylval.bool_value = 1; yycolumn += strlen(yytext); return T_TRUE; }
+"FALSE"                             { yylval.bool_value = 0; yycolumn += strlen(yytext); return T_FALSE; }
 
-{TIP}                               {
-                                        printf("tip %s\n", yytext);
-                                    }
+"INT"                               { yycolumn += strlen(yytext); return INT; }
+"DOUBLE"                            { yycolumn += strlen(yytext); return DOUBLE; }
+"BOOL"                              { yycolumn += strlen(yytext); return BOOL; }
+"STRING"                            { yycolumn += strlen(yytext); return STRING; }
 
-"if"                                { return T_IF; }
-"else"                              { return T_ELSE; }
-"while"                             { return T_WHILE; }
-"for"                               { return T_FOR; }
-"break"                             { return T_BREAK; }
+"IF"                                { yycolumn += strlen(yytext); return T_IF; }
+"THEN"                              { yycolumn += strlen(yytext); return T_THEN; }
+"ELSE"                              { yycolumn += strlen(yytext); return T_ELSE; }
+"WHILE"                             { yycolumn += strlen(yytext); return T_WHILE; }
+"DO"                                { yycolumn += strlen(yytext); return T_DO; }
+"FOR"                               { yycolumn += strlen(yytext); return T_FOR; }
+"BREAK"                             { yycolumn += strlen(yytext); return T_BREAK; }
+"READ"                              { yycolumn += strlen(yytext); }
+"WRITE"                             { yycolumn += strlen(yytext); }
 
-{OPERACIJE}                         {
-                                        switch (yytext[0]) {
-                                            case '+':
-                                                return T_PLUS;
-                                            case '-':
-                                                return T_MINUS;
-                                            case '*':
-                                                return T_MULT;
-                                            case '/':
-                                                return T_DIV;
-                                            case '%':
-                                                return T_MOD;
-                                            default:
-                                                yyerror("Unknown operator");
-                                                return 0;
-                                        }
-                                    }
+"LET"                               { yycolumn += strlen(yytext); return T_LET; }
+"IN"                                { yycolumn += strlen(yytext); }
+"END"                               { yycolumn += strlen(yytext); return T_END; }
+"SKIP"                              { yycolumn += strlen(yytext); }
 
 [a-zA-Z][0-9a-zA-Z_]*               {   if(strlen(yytext)<=31){
                                             //printf("%s",yytext);
                                             yylval.ident=yytext;
                                             printf("%s = ", yytext);
+                                            yycolumn += strlen(yytext);
                                             return T_ID;
                                         }else{
-                                            printf("ID je predugačak, greška u liniji %d\n", yylineno);
+                                            yycolumn += strlen(yytext);
+                                            invalid_ident(yylineno, yycolumn);
                                         }
                                     }
 
 \"([^"\n]|\\.)*\"                   {
-                                        printf("STRING %s\n", yytext);
+                                        yylval.ident=yytext;
+                                        yycolumn += strlen(yytext);
+                                        return T_STRING;
                                     }
 
 
-"<="                                { return T_LE; }
-">="                                { return T_GE; }
-"<"                                 { return T_LT; }
-">"                                 { return T_GT; }
-"=="                                { return T_EQEQ; }
-"!="                                { return T_NEQ; }
+"<="                                { yycolumn += strlen(yytext); return T_LE; }
+">="                                { yycolumn += strlen(yytext); return T_GE; }
+"<"                                 { yycolumn += strlen(yytext); return T_LT; }
+">"                                 { yycolumn += strlen(yytext); return T_GT; }
+"=="                                { yycolumn += strlen(yytext); return T_EQEQ; }
+"!="                                { yycolumn += strlen(yytext); return T_NEQ; }
 
-"!"                                 {
-                                        return T_NOT;
-                                    }
+"!"                                 { yycolumn++; return T_NOT; }
 
-"="                                 {
-                                        return T_EQ;
-                                    }
+"="                                 { yycolumn++; return T_EQ; }
 
-"&&"                                {
-                                        return T_AND;
-                                    }
+"&&"                                { yycolumn += strlen(yytext); return T_AND; }
 
-"||"                                {
-                                        return T_OR;
-                                    }
+"||"                                { yycolumn += strlen(yytext); return T_OR; }
 
-"("                                 {
-                                        return T_LEFTP;
-                                    }
+"("                                 { yycolumn++; return T_LEFTP; }
 
-")"                                 {
-                                        return T_RIGHTP;
-                                    }
+")"                                 { yycolumn++; return T_RIGHTP; }
 
-"{"                                 {
-                                        return T_LEFTC;
-                                    }
+"{"                                 { yycolumn++; return T_LEFTC; }
 
-"}"                                 {
-                                        return T_RIGHTC;
-                                    }
+"}"                                 { yycolumn++; return T_RIGHTC; }
 
-"\\"                                {
-                                        printf("%s\n" ,yytext);
-                                    }
+";"                                 { yycolumn++; return T_SC; }
 
-";"                                 {
-                                        return T_SC;
-                                    }
-
-[ \t\n]                             { }
+[ \t\n]                             { yycolumn += strlen(yytext); }
 
 "//"                {
                         BEGIN(LINE_COMMENT);
@@ -134,15 +116,15 @@ OPERACIJE [-*/+%]
 
 <LINE_COMMENT>{
 "\n"                { BEGIN(INITIAL); } 
-"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara, geška u liniji %d\n",yylineno); }
+"//"|"/*"           { invalid_comment(yylineno); }
 .                   { }
 }
 
 <MULTILINE_COMMENT>{
 "*/"                { BEGIN(INITIAL); }
-"//"|"/*"           { printf("Nije moguce ugnjezdavanje komentara, geška u liniji %d\n",yylineno); }
+"//"|"/*"           { invalid_comment(yylineno); }
 .                   { }
-"\n"                { }
+"\n"                { yycolumn=1; }
 }
 
 %%

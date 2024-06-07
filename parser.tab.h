@@ -39,36 +39,45 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     T_INT = 258,
-     T_DOUBLE = 259,
-     T_SC = 260,
-     T_PLUS = 261,
-     T_MINUS = 262,
-     T_MULT = 263,
-     T_DIV = 264,
-     T_MOD = 265,
-     T_LT = 266,
-     T_GT = 267,
-     T_LE = 268,
-     T_GE = 269,
-     T_EQEQ = 270,
-     T_NEQ = 271,
-     T_TRUE = 272,
-     T_FALSE = 273,
-     T_AND = 274,
-     T_OR = 275,
-     T_NOT = 276,
-     T_LEFTP = 277,
-     T_RIGHTP = 278,
-     T_LEFTC = 279,
-     T_RIGHTC = 280,
-     T_ID = 281,
-     T_IF = 282,
-     T_ELSE = 283,
-     T_WHILE = 284,
-     T_FOR = 285,
-     T_BREAK = 286,
-     T_EQ = 287
+     T_LET = 258,
+     T_END = 259,
+     INT = 260,
+     DOUBLE = 261,
+     BOOL = 262,
+     STRING = 263,
+     T_INT = 264,
+     T_DOUBLE = 265,
+     T_STRING = 266,
+     T_SC = 267,
+     T_PLUS = 268,
+     T_MINUS = 269,
+     T_MULT = 270,
+     T_DIV = 271,
+     T_MOD = 272,
+     T_LT = 273,
+     T_GT = 274,
+     T_LE = 275,
+     T_GE = 276,
+     T_EQEQ = 277,
+     T_NEQ = 278,
+     T_TRUE = 279,
+     T_FALSE = 280,
+     T_AND = 281,
+     T_OR = 282,
+     T_NOT = 283,
+     T_LEFTP = 284,
+     T_RIGHTP = 285,
+     T_LEFTC = 286,
+     T_RIGHTC = 287,
+     T_ID = 288,
+     T_IF = 289,
+     T_ELSE = 290,
+     T_WHILE = 291,
+     T_FOR = 292,
+     T_BREAK = 293,
+     T_DO = 294,
+     T_THEN = 295,
+     T_EQ = 296
    };
 #endif
 
@@ -89,7 +98,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 93 "parser.tab.h"
+#line 102 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -13,8 +13,11 @@
 }
 
 %start S
+%token T_LET T_END
+%token INT DOUBLE BOOL STRING 
 %token <int_value> T_INT
 %token <double_value> T_DOUBLE
+%token <iden> T_STRING
 %token T_SC
 %token T_PLUS T_MINUS T_MULT T_DIV T_MOD
 %token T_LT T_GT T_LE T_GE T_EQEQ T_NEQ
@@ -22,7 +25,7 @@
 %token T_AND T_OR T_NOT
 %token T_LEFTP T_RIGHTP T_LEFTC T_RIGHTC
 %token <ident> T_ID
-%token T_IF T_ELSE T_WHILE T_FOR T_BREAK
+%token T_IF T_ELSE T_WHILE T_FOR T_BREAK T_DO T_THEN
 %token T_EQ
 
 %right T_EQ
