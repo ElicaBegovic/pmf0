@@ -7,5 +7,17 @@ void invalid_comment(int line) {
 }
 
 void invalid_ident(int line, int col) {
-    printf("Identifikator je predugačak. Greška u liniji: ", line, " koloni: ", col);
+    printf("Identifikator nije u redu. Greška u liniji: ", line, " koloni: ", col);
+}
+
+void invalid_int(int line, int col) {
+    printf("Int nije u redu. Greška u liniji: ", line, " koloni: ", col);
+}
+
+void invalid_double(int line, int col) {
+    printf("Double nije u redu. Greška u liniji: ", line, " koloni: ", col);
+}
+
+void invalid_string(int line, int col) {
+    printf("String nije u redu. Greška u liniji: ", line, " koloni: ", col);
 }

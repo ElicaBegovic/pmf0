@@ -11,22 +11,22 @@
     char* ident;
     int bool_value;
 }
-
-%start S
-%token T_LET T_END
-%token INT DOUBLE BOOL STRING 
 %token <int_value> T_INT
 %token <double_value> T_DOUBLE
-%token <iden> T_STRING
-%token T_SC
+%token <bool_value> T_TRUE T_FALSE
+%token <ident> T_STRING
+
+%token T_ID
+
+%token T_LET T_IN T_EQ T_SC T_END 
+%token INT DOUBLE BOOL STRING 
 %token T_PLUS T_MINUS T_MULT T_DIV T_MOD
 %token T_LT T_GT T_LE T_GE T_EQEQ T_NEQ
-%token <bool_value> T_TRUE T_FALSE
 %token T_AND T_OR T_NOT
-%token T_LEFTP T_RIGHTP T_LEFTC T_RIGHTC
-%token <ident> T_ID
-%token T_IF T_ELSE T_WHILE T_FOR T_BREAK T_DO T_THEN
-%token T_EQ
+
+%token T_LEFTP T_RIGHTP T_LEFTC T_RIGHTC T_LEFTS T_RIGHTS
+%token T_IF T_ELSE T_WHILE T_FOR T_BREAK T_CONTINUE T_DO T_THEN T_RETURN
+%token T_READ T_WRITE T_SKIP
 
 %right T_EQ
 %left T_OR T_AND
@@ -36,82 +36,109 @@
 %left T_MULT T_DIV T_MOD
 %right T_NOT
 
-%type <int_value> int_exp
-%type <double_value> double_exp
-%type <bool_value> comp_exp
-%type <bool_value> bool_exp
-%type <int_value> if_exp
-%type <int_value> while_exp
-%type <int_value> stat
+%start program
 
 %%
-S: S stat                         { }
-    | //prazna rec
+program: T_LET T_LEFTS declarations T_RIGHTS T_IN statements T_END 
 ;
 
-stat: T_ID T_EQ int_exp T_SC  { printf("%d \n", $3); }
-    | T_ID T_EQ double_exp T_SC  { printf("%f \n", $3); }
-    | T_ID T_EQ comp_exp T_SC  { printf("%s \n", $3 ? "True":"False"); }
-    | T_ID T_EQ bool_exp T_SC { printf("%s \n", $3 ? "True":"False"); }
-    | if_exp { }
-    | while_exp { }
-;
+/*declarations*/
+declarations: declarations declaration 
+            | declaration 
+            ;
 
-int_exp: T_INT { $$ = $1; }
-    | int_exp T_PLUS int_exp { $$ = $1 + $3; }
-    | int_exp T_MINUS int_exp { $$ = $1 - $3; }
-    | int_exp T_MULT int_exp { $$ = $1 * $3; }
-    | int_exp T_DIV int_exp { $$ = $1 / $3; }
-    | int_exp T_MOD int_exp { $$ = $1 % $3; }
-    | T_LEFTP int_exp T_RIGHTP { $$ = $2; }
-;
+declaration: type T_ID T_SC 
+           ;
 
-double_exp: T_DOUBLE { $$ = $1; }
-    | double_exp T_PLUS double_exp { $$ = $1 + $3; }
-    | double_exp T_MINUS double_exp { $$ = $1 - $3; }
-    | double_exp T_MULT double_exp { $$ = $1 * $3; }
-    | double_exp T_DIV double_exp { $$ = $1 / $3; }
-    | T_LEFTP double_exp T_RIGHTP { $$ = $2; }
-;
+type: INT 
+    | STRING 
+    | DOUBLE 
+    | BOOL 
+    ;
 
-comp_exp: T_INT { $$ = $1; } //dodato za vise NE RADI
-    | T_DOUBLE { $$ = $1; } //dodato za vise
-    | int_exp T_LT int_exp { $$ = $1 < $3 ? 1 : 0; } // poređenje za int
-    | int_exp T_GT int_exp { $$ = $1 > $3 ? 1 : 0; }
-    | int_exp T_LE int_exp { $$ = $1 <= $3 ? 1 : 0; }
-    | int_exp T_GE int_exp { $$ = $1 >= $3 ? 1 : 0; }
-    | int_exp T_EQEQ int_exp { $$ = $1 == $3 ? 1 : 0; }
-    | int_exp T_NEQ int_exp { $$ = $1 != $3 ? 1 : 0; }
-    | double_exp T_LT double_exp { $$ = $1 < $3 ? 1 : 0; } // poređenja za double
-    | double_exp T_GT double_exp { $$ = $1 > $3 ? 1 : 0; }
-    | double_exp T_LE double_exp { $$ = $1 <= $3 ? 1 : 0; }
-    | double_exp T_GE double_exp { $$ = $1 >= $3 ? 1 : 0; }
-    | double_exp T_EQEQ double_exp { $$ = $1 == $3 ? 1 : 0; }
-    | double_exp T_NEQ double_exp { $$ = $1 != $3 ? 1 : 0; }
-    | comp_exp T_LT comp_exp { $$ = $1 && $3 ? 1 : 0; } // poređenja za vise NE RADI
-    | comp_exp T_GT comp_exp { $$ = $1 && $3 ? 1 : 0; }
-    | comp_exp T_LE comp_exp { $$ = $1 && $3 ? 1 : 0; }
-    | comp_exp T_GE comp_exp { $$ = $1 && $3 ? 1 : 0; }
-    | comp_exp T_EQEQ comp_exp { $$ = $1 && $3 ? 1 : 0; }
-    | comp_exp T_NEQ comp_exp { $$ = $1 && $3 ? 1 : 0; }
-    | T_LEFTP comp_exp T_RIGHTP { $$ = $2; }
-;
+/*statements*/
+statements: statements statement 
+          | statement 
+          ;
 
-bool_exp: T_TRUE { $$ = $1; }
-    | T_FALSE { $$ = $1; }
-    | comp_exp { $$ = $1; }
-    | bool_exp T_AND bool_exp { $$ = $1 && $3; }
-    | bool_exp T_OR bool_exp { $$ = $1 || $3; }
-    | T_NOT bool_exp { $$ = $2==1 ? 0 : 1; }
-    | T_LEFTP bool_exp T_RIGHTP { $$ = $2; }
-    
-;
+statement: expression T_SC 
+         | if_exp 
+         | for_exp 
+         | while_exp 
+         | assignment T_SC 
+         
+         ;
 
-if_exp: T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC T_ELSE T_LEFTC stat T_RIGHTC { if ($3==1) { $$ = $6; } else { $$ = $10; } }
-    | T_IF T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC  { if ($3) { $$ = $6; } }
+assignment: T_ID T_EQ expression 
+          ;
 
-while_exp: T_WHILE T_LEFTP bool_exp T_RIGHTP T_LEFTC stat T_RIGHTC { if ($3) { $$ = $6; } }
+if_exp: T_IF T_LEFTP expression T_RIGHTP tail else_if optional_else 
+      | T_IF T_LEFTP expression T_RIGHTP tail optional_else 
+      ;
 
+else_if: else_if T_ELSE T_IF T_LEFTP expression T_RIGHTP tail 
+       | T_ELSE T_IF T_LEFTP expression T_RIGHTP tail 
+       ;
+
+optional_else: T_ELSE tail 
+             | /* empty */ 
+             ;
+
+for_exp: T_FOR T_LEFTP assignment T_SC expression T_SC expression T_RIGHTP tail 
+       ;
+
+while_exp: T_WHILE T_LEFTP expression T_RIGHTP tail 
+         ;
+
+tail: T_LEFTC statements T_RIGHTC 
+    ;
+
+/*expressions*/
+expression: int_exp 
+          | double_exp 
+          | bool_exp 
+          | comp_exp 
+          ;
+
+int_exp: int_exp T_PLUS int_exp 
+       | int_exp T_MINUS int_exp 
+       | int_exp T_MULT int_exp 
+       | int_exp T_DIV int_exp 
+       | int_exp T_MOD int_exp 
+       | T_LEFTP int_exp T_RIGHTP 
+       | T_INT
+       ;
+
+double_exp: T_DOUBLE 
+          | double_exp T_PLUS double_exp 
+          | double_exp T_MINUS double_exp 
+          | double_exp T_MULT double_exp 
+          | double_exp T_DIV double_exp 
+          | T_LEFTP double_exp T_RIGHTP 
+          ;
+
+comp_exp: int_exp T_LT int_exp 
+        | int_exp T_GT int_exp 
+        | int_exp T_LE int_exp 
+        | int_exp T_GE int_exp 
+        | int_exp T_EQEQ int_exp 
+        | int_exp T_NEQ int_exp 
+        | double_exp T_LT double_exp 
+        | double_exp T_GT double_exp 
+        | double_exp T_LE double_exp 
+        | double_exp T_GE double_exp 
+        | double_exp T_EQEQ double_exp 
+        | double_exp T_NEQ double_exp 
+        ;
+
+bool_exp: T_TRUE 
+        | T_FALSE 
+        | comp_exp 
+        | bool_exp T_AND bool_exp 
+        | bool_exp T_OR bool_exp 
+        | T_NOT bool_exp 
+        | T_LEFTP bool_exp T_RIGHTP 
+        ;
 
 %%
 

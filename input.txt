@@ -1,19 +1,10 @@
-x=1+2;
-x=5.2>=3.9;
-x=5;
-y=5.2>=3.9 && 5.2<3.9;
-z=6-3+2;
-p= ((3-1==3-1) && (3-2>3-3)) && (3<3);
-IF(3<5){ 
-    a=7+2; 
-} ELSE { 
-    a=8+5;
-}
-z= !TRUE;
+LET 
+[ 
+    INT x; 
+    INT y;
+] 
+IN 
+4*6+5;
+5+5; 
+END
 
-/*
-flex lexer.l
-bison -d parser.y
-gcc -o parser lex.yy.c parser.tab.c -lfl 
-parser < input.txt
-*/

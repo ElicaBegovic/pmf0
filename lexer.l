@@ -23,7 +23,7 @@
                                                             return T_INT;
                                                         }
 
-[0-9]+"."[0-9]*(("E"|"e")("+"|"-")?[0-9]+)?             {
+[0-9]+"."[0-9]*(("E"|"e")("+"|"-")?[0-9]+)?             { 
                                                             yylval.double_value = atof(yytext);
                                                             yycolumn += strlen(yytext);
                                                             return T_DOUBLE;
@@ -54,14 +54,12 @@
 "WRITE"                             { yycolumn += strlen(yytext); }
 
 "LET"                               { yycolumn += strlen(yytext); return T_LET; }
-"IN"                                { yycolumn += strlen(yytext); }
+"IN"                                { yycolumn += strlen(yytext); return T_IN;}
 "END"                               { yycolumn += strlen(yytext); return T_END; }
 "SKIP"                              { yycolumn += strlen(yytext); }
 
 [a-zA-Z][0-9a-zA-Z_]*               {   if(strlen(yytext)<=31){
-                                            //printf("%s",yytext);
-                                            yylval.ident=yytext;
-                                            printf("%s = ", yytext);
+                                            //yylval.ident=strdup(yytext);
                                             yycolumn += strlen(yytext);
                                             return T_ID;
                                         }else{
@@ -100,6 +98,10 @@
 
 "}"                                 { yycolumn++; return T_RIGHTC; }
 
+"["                                 { yycolumn++; return T_LEFTS; }
+
+"]"                                 { yycolumn++; return T_RIGHTS; }
+
 ";"                                 { yycolumn++; return T_SC; }
 
 [ \t\n]                             { yycolumn += strlen(yytext); }
@@ -111,6 +113,13 @@
 "/*"                {
                         BEGIN(MULTILINE_COMMENT);
                     }
+
+(0x|0X)[^0-9a-fA-F]             { yycolumn += strlen(yytext); invalid_int(yylineno, yycolumn); }
+
+"0"[0-9]*                       { yycolumn += strlen(yytext); invalid_int(yylineno, yycolumn); }
+
+"\""([^"\n]|\\.)*\"            { yycolumn += strlen(yytext); invalid_string(yylineno, yycolumn); }
+
 
 .                   { }
 
