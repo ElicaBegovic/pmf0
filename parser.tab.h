@@ -96,7 +96,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 13 "parser.y"
+#line 15 "parser.y"
 
     int int_value;
     double double_value;

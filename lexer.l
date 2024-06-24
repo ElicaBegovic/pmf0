@@ -117,7 +117,9 @@
 
 "0"[0-9]*                       { yycolumn += strlen(yytext); invalid_int(yylineno, yycolumn); }
 
-"\""([^"\n]|\\.)*\"            { yycolumn += strlen(yytext); invalid_string(yylineno, yycolumn); }
+"\""([^"\n]|\\.)*\"             { yycolumn += strlen(yytext); invalid_string(yylineno, yycolumn); }
+
+\d*\.\d*\.\d*                   { yycolumn += strlen(yytext); invalid_double(yylineno, yycolumn); }
 
 
 .                   { }

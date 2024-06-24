@@ -4,21 +4,24 @@ LET
     INT y;
 ] 
 IN 
-/*
+
 x=4*6+5;
-y=5+5; 
+y=5.6+5.5; 
+
 
 FOR(x=7; x<8; x++) {
-    6-7;
+    x=6-7;
 }
-*/
-WHILE(TRUE){
+
+WHILE(3<5){
     x=3+4;
 }
-/*
-IF(7>=x) {
+
+IF(7>=8) {
    y=5.4-7.5;
+}ELSE IF(FALSE){
+    x=FALSE;
 }
-*/
+
 END
 

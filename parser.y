@@ -3,6 +3,8 @@
     #include <stdio.h>
     #include <string.h>
     #include "tree.h"
+    extern int yylineno;
+    extern int yycolumn;
     
     void yyerror(const char* s);
     //int yylex();
@@ -35,7 +37,6 @@
 %token T_IF T_ELSE T_WHILE T_FOR T_BREAK T_CONTINUE T_DO T_THEN T_RETURN
 %token T_READ T_WRITE T_SKIP
 
-%right T_EQ
 %left T_OR T_AND
 %nonassoc T_EQEQ T_NEQ
 %nonassoc T_LT T_GT T_LE T_GE
@@ -43,7 +44,7 @@
 %left T_MULT T_DIV T_MOD
 %right T_NOT
 
-%type <tree_node> program declarations declaration type statements statement assignment if_exp else_if optional_else for_exp while_exp tail increment expression int_exp double_exp bool_exp comp_op
+%type <tree_node> program declarations declaration type statements statement assignment if_exp else_if optional_else for_exp for_condition while_exp tail increment expression int_exp double_exp bool_exp comp_op
 
 %start program
 
@@ -59,7 +60,6 @@ program: T_LET T_LEFTS declarations T_RIGHTS T_IN statements T_END {
         }
 ;
 
-/*declarations*/
 declarations: declarations declaration {
                  $$ = $1;
                  add_child($$, $2);
@@ -91,7 +91,6 @@ type: INT {
        }
     ;
 
-/*statements*/
 statements: statements statement {
                 $$ = $1;
                 add_child($$, $2);
@@ -133,7 +132,7 @@ if_exp: T_IF T_LEFTP bool_exp T_RIGHTP tail optional_else {
            if ($6) add_child($$, $6);
        }
       | T_IF T_LEFTP bool_exp T_RIGHTP tail else_if optional_else {
-           $$ = create_node("if-else_if");
+           $$ = create_node("if else_if");
            add_child($$, $3);
            add_child($$, $5);
            add_child($$, $6);
@@ -163,7 +162,7 @@ optional_else: T_ELSE tail {
               }
              ;
 
-for_exp: T_FOR T_LEFTP assignment T_SC bool_exp T_SC increment T_RIGHTP tail {
+for_exp: T_FOR T_LEFTP assignment T_SC for_condition T_SC increment T_RIGHTP tail {
             $$ = create_node("for");
             add_child($$, $3);
             add_child($$, $5);
@@ -171,6 +170,25 @@ for_exp: T_FOR T_LEFTP assignment T_SC bool_exp T_SC increment T_RIGHTP tail {
             add_child($$, $9);
         }
        ;
+
+for_condition: T_ID T_LT T_INT {
+                $$ = create_node("for condition");
+                add_child($$, create_node("ID"));
+                add_child($$, create_node("<"));
+                char buffer[20];
+                sprintf(buffer, "%d", $3);
+                add_child($$, create_node(buffer));
+               }
+              | T_ID T_LE T_INT {
+                $$ = create_node("for condition");
+                add_child($$, create_node("ID"));
+                add_child($$, create_node("<="));
+                char buffer[20];
+                sprintf(buffer, "%d", $3);
+                add_child($$, create_node(buffer));
+               }
+            ;
+
 
 while_exp: T_WHILE T_LEFTP bool_exp T_RIGHTP tail {
               $$ = create_node("while");
@@ -187,10 +205,16 @@ tail: T_LEFTC statements T_RIGHTC {
 increment: T_ID T_PLUS T_PLUS {
                $$ = create_node("increment");
                add_child($$, create_node("ID"));
+               add_child($$, create_node("++"));
            }
+         | T_ID T_MINUS T_MINUS {
+               $$ = create_node("decrement");
+               add_child($$, create_node("ID"));
+               add_child($$, create_node("--"));
+           }
+
          ;
 
-/*expressions*/
 expression: T_ID {
                 $$ = create_node("expression");
                add_child($$, create_node("ID"));
@@ -215,31 +239,31 @@ int_exp: T_INT {
        | int_exp T_PLUS int_exp {
              $$ = create_node("int_exp");
              add_child($$, $1);
-             add_child($$, create_node("PLUS"));
+             add_child($$, create_node("+"));
              add_child($$, $3);
          }
        | int_exp T_MINUS int_exp {
              $$ = create_node("int_exp");
              add_child($$, $1);
-             add_child($$, create_node("MINUS"));
+             add_child($$, create_node("-"));
              add_child($$, $3);
          }
        | int_exp T_MULT int_exp {
              $$ = create_node("int_exp");
              add_child($$, $1);
-             add_child($$, create_node("MULT"));
+             add_child($$, create_node("*"));
              add_child($$, $3);
          }
        | int_exp T_DIV int_exp {
              $$ = create_node("int_exp");
              add_child($$, $1);
-             add_child($$, create_node("DIV"));
+             add_child($$, create_node("/"));
              add_child($$, $3);
          }
        | int_exp T_MOD int_exp {
              $$ = create_node("int_exp");
              add_child($$, $1);
-             add_child($$, create_node("MOD"));
+             add_child($$, create_node("%"));
              add_child($$, $3);
          }
        | T_LEFTP int_exp T_RIGHTP {
@@ -353,13 +377,11 @@ comp_op: T_LT {
 %%
 
 void yyerror(const char* s){
-    printf("%s\n", s);
+    printf("Greska na liniji %d, u koloni %d \n", yylineno, yycolumn);
 }
 
 int main(){
-    printf("aaaa");
     int res = yyparse();    
-    printf("aaaa");
     printf("%d ", res);
     if(res == 0){
         printf("Ulaz je ispravan!\n");
