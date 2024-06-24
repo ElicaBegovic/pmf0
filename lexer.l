@@ -4,7 +4,6 @@
     #include <string.h>
 
     #include "errors.h"
-    #include "errors.c"
     #include "parser.tab.h"
 
     int yycolumn=1;

@@ -5,8 +5,9 @@
     #include "tree.h"
     
     void yyerror(const char* s);
-    int yylex(void);
-    TreeNode* root;
+    //int yylex();
+
+    struct TreeNode* root = NULL;
 %}
 
 %union {
@@ -14,7 +15,7 @@
     double double_value;
     char* ident;
     int bool_value;
-    TreeNode* tree_node;
+    struct TreeNode* tree_node;
 }
 
 %token <int_value> T_INT
@@ -42,14 +43,17 @@
 %left T_MULT T_DIV T_MOD
 %right T_NOT
 
-%type <tree_node> program declarations declaration type statements statement assignment if_exp else_if optional_else for_exp while_exp tail increment expression int_exp aritm_op double_exp bool_exp comp_exp comp_op
+%type <tree_node> program declarations declaration type statements statement assignment if_exp else_if optional_else for_exp while_exp tail increment expression int_exp double_exp bool_exp comp_op
 
 %start program
 
 %%
 program: T_LET T_LEFTS declarations T_RIGHTS T_IN statements T_END {
             $$ = create_node("program");
+            add_child($$, create_node("LET"));
             add_child($$, $3);
+            add_child($$, create_node("IN"));
+            add_child($$, $6);
             add_child($$, create_node("END"));
             root = $$;
         }
@@ -159,7 +163,7 @@ optional_else: T_ELSE tail {
               }
              ;
 
-for_exp: T_FOR T_LEFTP assignment T_SC comp_exp T_SC increment T_RIGHTP tail {
+for_exp: T_FOR T_LEFTP assignment T_SC bool_exp T_SC increment T_RIGHTP tail {
             $$ = create_node("for");
             add_child($$, $3);
             add_child($$, $5);
@@ -187,16 +191,17 @@ increment: T_ID T_PLUS T_PLUS {
          ;
 
 /*expressions*/
-expression: int_exp {
+expression: T_ID {
+                $$ = create_node("expression");
+               add_child($$, create_node("ID"));
+            } 
+          |int_exp {
                 $$ = $1;
             }
           | double_exp {
                 $$ = $1;
             }
           | bool_exp {
-                $$ = $1;
-            }
-          | comp_exp {
                 $$ = $1;
             }
           ;
@@ -207,14 +212,34 @@ int_exp: T_INT {
              sprintf(buffer, "%d", $1);
              add_child($$, create_node(buffer));
          }
-       | T_ID {
-             $$ = create_node("int_exp");
-             add_child($$, create_node("ID"));
-         }
-       | int_exp aritm_op int_exp {
+       | int_exp T_PLUS int_exp {
              $$ = create_node("int_exp");
              add_child($$, $1);
-             add_child($$, $2);
+             add_child($$, create_node("PLUS"));
+             add_child($$, $3);
+         }
+       | int_exp T_MINUS int_exp {
+             $$ = create_node("int_exp");
+             add_child($$, $1);
+             add_child($$, create_node("MINUS"));
+             add_child($$, $3);
+         }
+       | int_exp T_MULT int_exp {
+             $$ = create_node("int_exp");
+             add_child($$, $1);
+             add_child($$, create_node("MULT"));
+             add_child($$, $3);
+         }
+       | int_exp T_DIV int_exp {
+             $$ = create_node("int_exp");
+             add_child($$, $1);
+             add_child($$, create_node("DIV"));
+             add_child($$, $3);
+         }
+       | int_exp T_MOD int_exp {
+             $$ = create_node("int_exp");
+             add_child($$, $1);
+             add_child($$, create_node("MOD"));
              add_child($$, $3);
          }
        | T_LEFTP int_exp T_RIGHTP {
@@ -222,37 +247,11 @@ int_exp: T_INT {
          }
        ;
 
-aritm_op: T_PLUS {
-              $$ = create_node("aritm_op");
-              add_child($$, create_node("+"));
-          }
-        | T_MINUS {
-              $$ = create_node("aritm_op");
-              add_child($$, create_node("-"));
-          }
-        | T_MULT {
-              $$ = create_node("aritm_op");
-              add_child($$, create_node("*"));
-          }
-        | T_DIV {
-              $$ = create_node("aritm_op");
-              add_child($$, create_node("/"));
-          }
-        | T_MOD {
-              $$ = create_node("aritm_op");
-              add_child($$, create_node("%"));
-          }
-        ;
-
 double_exp: T_DOUBLE {
                 $$ = create_node("double_exp");
                 char buffer[40];
                 sprintf(buffer, "%f", $1);
                 add_child($$, create_node(buffer));
-            }
-          | T_ID {
-                $$ = create_node("double_exp");
-                add_child($$, create_node("ID"));
             }
           | double_exp T_PLUS double_exp {
                 $$ = create_node("double_exp");
@@ -291,13 +290,6 @@ bool_exp: T_TRUE {
              $$ = create_node("bool_exp");
              add_child($$, create_node("false"));
          }
-        | T_ID {
-             $$ = create_node("bool_exp");
-             add_child($$, create_node("ID"));
-         }
-        | comp_exp {
-             $$ = $1;
-         }
         | bool_exp T_AND bool_exp {
              $$ = create_node("bool_exp");
              add_child($$, $1);
@@ -318,22 +310,17 @@ bool_exp: T_TRUE {
         | T_LEFTP bool_exp T_RIGHTP {
              $$ = $2;
          }
-        ;
-
-comp_exp: int_exp comp_op int_exp {
-             $$ = create_node("comp_exp");
+        | int_exp comp_op int_exp {
+             $$ = create_node("bool_exp");
              add_child($$, $1);
              add_child($$, $2);
              add_child($$, $3);
-         }
+         } 
         | double_exp comp_op double_exp {
-             $$ = create_node("comp_exp");
+             $$ = create_node("bool_exp");
              add_child($$, $1);
              add_child($$, $2);
              add_child($$, $3);
-         }
-        | T_LEFTP comp_exp T_RIGHTP {
-             $$ = $2;
          }
         ;
 
@@ -370,7 +357,10 @@ void yyerror(const char* s){
 }
 
 int main(){
+    printf("aaaa");
     int res = yyparse();    
+    printf("aaaa");
+    printf("%d ", res);
     if(res == 0){
         printf("Ulaz je ispravan!\n");
         print_tree(root, 0);

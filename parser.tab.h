@@ -96,13 +96,13 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 12 "parser.y"
+#line 13 "parser.y"
 
     int int_value;
     double double_value;
     char* ident;
     int bool_value;
-    TreeNode* tree_node;
+    struct TreeNode* tree_node;
 
 
 

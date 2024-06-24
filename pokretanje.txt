@@ -1,6 +1,6 @@
 /*
 flex lexer.l
 bison -d parser.y
-gcc -o parser lex.yy.c parser.tab.c -lfl 
+gcc -o parser lex.yy.c parser.tab.c tree.c -lfl  
 parser < input.txt
 */
